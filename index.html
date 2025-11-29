@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crank — YOLO Mode Without Fear</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0a0a;
+            --fg: #e0e0e0;
+            --accent: #39ff14;
+            --accent-dim: #1a8a0a;
+            --accent-glow: rgba(57, 255, 20, 0.25);
+            --dim: #555;
+            --border: #222;
+            --surface: #111;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo::before {
+            content: '>';
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        nav {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--dim);
+            text-decoration: none;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--fg);
+        }
+
+        .btn {
+            font-family: 'Space Mono', monospace;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.1s;
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        .btn:hover {
+            background: var(--fg);
+            box-shadow: none;
+        }
+
+        .hero {
+            padding: 60px 0 40px;
+        }
+
+        .hero-text {
+            margin-bottom: 40px;
+        }
+
+        .hero-eyebrow {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 16px;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 .strike {
+            text-decoration: line-through;
+            color: var(--dim);
+        }
+
+        .hero h1 .highlight {
+            color: var(--accent);
+            text-shadow: 0 0 40px var(--accent-glow);
+        }
+
+        .hero-sub {
+            font-size: 1.25rem;
+            color: var(--dim);
+            max-width: 600px;
+        }
+
+        .hero-sub strong {
+            color: var(--fg);
+        }
+
+        .video-wrapper {
+            margin: 40px 0;
+            border: 2px solid var(--accent);
+            position: relative;
+            box-shadow: 0 0 50px var(--accent-glow);
+        }
+
+        .video-label {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--bg);
+            padding: 0 10px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .video-container {
+            aspect-ratio: 16 / 9;
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(57, 255, 20, 0.015) 2px,
+                rgba(57, 255, 20, 0.015) 4px
+            );
+            pointer-events: none;
+        }
+
+        .play-btn {
+            width: 80px;
+            height: 80px;
+            border: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        .video-container:hover .play-btn {
+            background: var(--accent);
+        }
+
+        .play-btn svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--accent);
+            margin-left: 4px;
+            transition: fill 0.2s;
+        }
+
+        .video-container:hover .play-btn svg {
+            fill: var(--bg);
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--dim);
+        }
+
+        .cta-row {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--fg);
+            box-shadow: none;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--fg);
+            background: transparent;
+        }
+
+        .problem-section {
+            padding: 80px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .problem-col h3 {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+            color: var(--dim);
+        }
+
+        .problem-col.bad h3 { color: #ff4444; }
+        .problem-col.good h3 { color: var(--accent); text-shadow: 0 0 8px var(--accent-glow); }
+
+        .problem-col p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .problem-col code {
+            font-family: 'Space Mono', monospace;
+            background: var(--surface);
+            padding: 2px 6px;
+            font-size: 0.9em;
+            color: var(--accent);
+        }
+
+        .terminal-section {
+            padding: 60px 0;
+        }
+
+        .terminal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .terminal-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .terminal-body {
+            padding: 20px;
+            line-height: 2;
+        }
+
+        .t-prompt { color: var(--accent); text-shadow: 0 0 5px var(--accent-glow); }
+        .t-cmd { color: var(--fg); }
+        .t-out { color: var(--dim); padding-left: 16px; display: block; }
+        .t-success { color: var(--accent); text-shadow: 0 0 8px var(--accent-glow); }
+        .t-highlight { color: #fff; }
+
+        .features-section {
+            padding: 80px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .feature {
+            background: var(--bg);
+            padding: 32px;
+            transition: background 0.2s;
+        }
+
+        .feature:hover {
+            background: var(--surface);
+        }
+
+        .feature-num {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .feature h4 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .feature p {
+            font-size: 0.9rem;
+            color: var(--dim);
+        }
+
+        .footer-cta {
+            padding: 80px 0;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-cta h2 {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .footer-cta p {
+            color: var(--dim);
+            margin-bottom: 24px;
+        }
+
+        footer {
+            padding: 24px 0;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--dim);
+        }
+
+        footer a {
+            color: var(--dim);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--fg);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .problem-grid { grid-template-columns: 1fr; }
+            .features-grid { grid-template-columns: 1fr; }
+            nav a:not(.btn) { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">CRANK</div>
+            <nav>
+                <a href="#">docs</a>
+                <a href="#">github</a>
+                <a href="#" class="btn">install</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <div class="hero-text">
+                <div class="hero-eyebrow">// Long-horizon AI agent harness</div>
+                <h1><span class="strike">Babysit</span> <span class="highlight">Unleash</span><br>your agents</h1>
+                <p class="hero-sub">
+                    Let Claude run <strong>for hours</strong>. Migrations, refactors, entire features. 
+                    CoW snapshots mean you can <strong>rollback in 12ms</strong> if it breaks.
+                </p>
+            </div>
+
+            <div class="video-wrapper">
+                <span class="video-label">Demo: 4hr refactor</span>
+                <div class="video-container" onclick="alert('Play video')">
+                    <div class="play-btn">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                    <span class="video-duration">01:32</span>
+                </div>
+            </div>
+
+            <div class="cta-row">
+                <a href="#" class="btn">curl -sL crank.dev/install | sh</a>
+                <a href="#" class="btn btn-ghost">View source →</a>
+            </div>
+        </section>
+
+        <section class="problem-section">
+            <div class="problem-grid">
+                <div class="problem-col bad">
+                    <h3>// The trap</h3>
+                    <p>
+                        You're clicking <code>approve</code> 100 times an hour. 
+                        Or you go full <code>--dangerously-skip-permissions</code> and pray. 
+                        Neither scales for real work.
+                    </p>
+                </div>
+                <div class="problem-col good">
+                    <h3>// The fix</h3>
+                    <p>
+                        Copy-on-write sandbox. Every file change captured. 
+                        Agent runs free, you run <code>crank rollback</code> if needed. 
+                        That's it.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="terminal-section">
+            <div class="terminal">
+                <div class="terminal-header">
+                    <span class="terminal-dot"></span>
+                    <span class="terminal-dot"></span>
+                    <span class="terminal-dot"></span>
+                </div>
+                <div class="terminal-body">
+                    <span class="t-prompt">$</span> <span class="t-cmd">crank --yolo "migrate everything to ESM"</span>
+                    <span class="t-out">snapshot <span class="t-highlight">0x8F2A</span> created (12ms)</span>
+                    <span class="t-out">agent running autonomously...</span>
+                    <span class="t-out" style="opacity: 0.5;">[3 hours later]</span>
+                    <span class="t-out"><span class="t-success">✓ 423 files converted</span></span>
+                    <span class="t-prompt">$</span> <span class="t-cmd">crank diff</span>
+                    <span class="t-out">showing changes from snapshot 0x8F2A...</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-num">01</div>
+                    <h4>12ms snapshots</h4>
+                    <p>Copy-on-write means instant captures with zero disk overhead.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-num">02</div>
+                    <h4>Sandboxed</h4>
+                    <p>FS + network isolation. Agent can't touch what you don't allow.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-num">03</div>
+                    <h4>Any model</h4>
+                    <p>Claude, Gemini, Codex, local models. Bring your own keys.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-num">04</div>
+                    <h4>Auditable</h4>
+                    <p>Full execution log. Every command, every file change tracked.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-num">05</div>
+                    <h4>No telemetry</h4>
+                    <p>Runs 100% local. Nothing phones home. Ever.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-num">06</div>
+                    <h4>MIT licensed</h4>
+                    <p>Fork it. Hack it. Ship it. No strings.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="footer-cta">
+            <h2>Stop babysitting. Start shipping.</h2>
+            <p>Your agents. Your machine. Your rules.</p>
+            <a href="#" class="btn">Get Crank →</a>
+        </section>
+
+        <footer>
+            <span>© 2025 Crank. MIT License.</span>
+            <div class="footer-links">
+                <a href="#">GitHub</a>
+                <a href="#">Discord</a>
+                <a href="#">Twitter</a>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
