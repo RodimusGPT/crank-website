@@ -142,6 +142,26 @@
             color: var(--fg);
         }
 
+        .rotating-text {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .rotating-text .word {
+            display: none;
+        }
+
+        .rotating-text .word.active {
+            display: inline;
+        }
+
+        .hero-detail {
+            font-size: 1rem;
+            color: var(--accent);
+            margin-top: 16px;
+            font-family: 'Space Mono', monospace;
+        }
+
         .video-wrapper {
             margin: 40px 0;
             border: 2px solid var(--accent);
@@ -417,8 +437,9 @@
                 <div class="hero-eyebrow">// Long-horizon AI agent harness</div>
                 <h1><span class="strike">Babysit</span> <span class="highlight">Unleash</span><br>your agents</h1>
                 <p class="hero-sub">
-                    Let Claude run <strong>for hours</strong>. Migrations, refactors, entire features. 
-                    CoW snapshots mean you can <strong>rollback in 12ms</strong> if it breaks.
+                    Let <span class="rotating-text"><span class="word active">Claude Code</span><span class="word">Gemini CLI</span><span class="word">OpenAI Codex</span></span> run <strong>for hours</strong>.<br>
+                    Entire features, migrations, refactors.<br>
+                    Copy-on-write snapshots enable <strong>instant rollback</strong> when things break.
                 </p>
             </div>
 
@@ -452,8 +473,8 @@
                     <h3>// The fix</h3>
                     <p>
                         Copy-on-write sandbox. Every file change captured. 
-                        Agent runs free, you run <code>crank rollback</code> if needed. 
-                        That's it.
+                        Agent runs free—and <code>crank rollback</code> works for agents <em>and</em> humans. 
+                        Autonomous self-correction, built in.
                     </p>
                 </div>
             </div>
@@ -470,10 +491,13 @@
                     <span class="t-prompt">$</span> <span class="t-cmd">crank --yolo "migrate everything to ESM"</span>
                     <span class="t-out">snapshot <span class="t-highlight">0x8F2A</span> created (12ms)</span>
                     <span class="t-out">agent running autonomously...</span>
-                    <span class="t-out" style="opacity: 0.5;">[3 hours later]</span>
-                    <span class="t-out"><span class="t-success">✓ 423 files converted</span></span>
-                    <span class="t-prompt">$</span> <span class="t-cmd">crank diff</span>
-                    <span class="t-out">showing changes from snapshot 0x8F2A...</span>
+                    <span class="t-out" style="opacity: 0.5;">[2 hours later]</span>
+                    <span class="t-out" style="color: #ff6b6b;">✗ build failed: 12 type errors</span>
+                    <span class="t-out">agent: reverting to snapshot 0x8F2A...</span>
+                    <span class="t-out"><span class="t-success">✓ rolled back (8ms)</span></span>
+                    <span class="t-out">agent: trying alternative approach...</span>
+                    <span class="t-out" style="opacity: 0.5;">[1 hour later]</span>
+                    <span class="t-out"><span class="t-success">✓ 423 files migrated, build passing</span></span>
                 </div>
             </div>
         </section>
@@ -482,33 +506,33 @@
             <div class="features-grid">
                 <div class="feature">
                     <div class="feature-num">01</div>
+                    <h4>Agent self-healing</h4>
+                    <p>Agents detect failures and rollback themselves. Retry with a new approach, no human needed.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-num">02</div>
                     <h4>12ms snapshots</h4>
                     <p>Copy-on-write means instant captures with zero disk overhead.</p>
                 </div>
                 <div class="feature">
-                    <div class="feature-num">02</div>
+                    <div class="feature-num">03</div>
                     <h4>Sandboxed</h4>
                     <p>FS + network isolation. Agent can't touch what you don't allow.</p>
                 </div>
                 <div class="feature">
-                    <div class="feature-num">03</div>
+                    <div class="feature-num">04</div>
                     <h4>Any model</h4>
                     <p>Claude, Gemini, Codex, local models. Bring your own keys.</p>
                 </div>
                 <div class="feature">
-                    <div class="feature-num">04</div>
+                    <div class="feature-num">05</div>
                     <h4>Auditable</h4>
                     <p>Full execution log. Every command, every file change tracked.</p>
                 </div>
                 <div class="feature">
-                    <div class="feature-num">05</div>
+                    <div class="feature-num">06</div>
                     <h4>No telemetry</h4>
                     <p>Runs 100% local. Nothing phones home. Ever.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-num">06</div>
-                    <h4>MIT licensed</h4>
-                    <p>Fork it. Hack it. Ship it. No strings.</p>
                 </div>
             </div>
         </section>
@@ -528,5 +552,16 @@
             </div>
         </footer>
     </div>
+
+    <script>
+        const words = document.querySelectorAll('.rotating-text .word');
+        let currentIndex = 0;
+        
+        setInterval(() => {
+            words[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex + 1) % words.length;
+            words[currentIndex].classList.add('active');
+        }, 2000);
+    </script>
 </body>
 </html>
